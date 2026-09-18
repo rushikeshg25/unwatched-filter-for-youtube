@@ -1,16 +1,27 @@
 /*
  * Styling for the Unwatched chip and the filtered grid.
  *
- * The chip normally borrows YouTube's own chip classes, so the rules here
- * only do three things: keep it laid out correctly in the bar, paint the
- * active state, and provide a complete fallback look (.ytu-chip--bare) for
- * when no template chip was available to borrow from.
+ * The chip is normally rebuilt from a real YouTube chip and keeps that
+ * chip's class names, so YouTube's own CSS paints it. The rules here only
+ * do three things: keep it laid out correctly on the row, paint the active
+ * state when YouTube's chips did not reveal a selected style to copy, and
+ * provide a complete fallback look (.ytu-chip--bare) for when there was no
+ * chip to rebuild from at all.
  */
 
 .ytu-chip {
   flex: 0 0 auto;
   margin-left: 8px;
   cursor: pointer;
+}
+
+/* Inside a wrapper copied from YouTube, spacing is already handled. */
+.ytu-chip-wrapper {
+  flex: 0 0 auto;
+}
+
+.ytu-chip-wrapper .ytu-chip {
+  margin-left: 0;
 }
 
 /* Fallback appearance, close to a YouTube chip, used only when the class
@@ -36,9 +47,10 @@
   color: var(--yt-spec-text-primary, #0f0f0f);
 }
 
-/* Active state mirrors how YouTube paints a selected chip: inverted in both
-   themes. !important because the borrowed classes set the same properties. */
-.ytu-chip--active {
+/* Active state, used only when YouTube's chips gave us no selected style to
+   copy. Mirrors how YouTube paints one: inverted in both themes. */
+.ytu-chip--bare.ytu-chip--paint-active,
+.ytu-chip--paint-active .ytu-chip__label {
   background: var(--yt-spec-text-primary, #0f0f0f) !important;
   color: var(--yt-spec-text-primary-inverse, #ffffff) !important;
 }

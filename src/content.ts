@@ -9,6 +9,7 @@
 
 import * as chip from './chip';
 import * as selectors from './selectors';
+import type { ChipBar } from './selectors';
 import * as watched from './watched';
 
 /** /@handle/videos, /channel/UC.../videos, /c/name/videos, /user/name/videos */
@@ -151,7 +152,7 @@ function updateNote(contents: HTMLElement): void {
  * no sort chips at all, so rather than dropping the feature the chip gets
  * a bar of its own just above the grid.
  */
-function chipHome(contents: HTMLElement): Element | null {
+function chipHome(contents: HTMLElement): ChipBar | null {
   const bar = selectors.findChipBar();
 
   if (bar) {
@@ -172,7 +173,7 @@ function chipHome(contents: HTMLElement): Element | null {
     parent.insertBefore(standaloneBar, contents);
   }
 
-  return standaloneBar;
+  return { row: standaloneBar, wrapper: null, chips: [] };
 }
 
 /** Leave the page exactly as we found it when navigating away. */
