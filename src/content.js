@@ -30,6 +30,8 @@
   /** Result of the last pass, also used by the diagnostics helper. */
   let stats = { total: 0, watched: 0, unwatched: 0 };
 
+  let noteNode = null;
+
   function onVideosPage() {
     return VIDEOS_PATH.test(location.pathname);
   }
@@ -68,9 +70,56 @@
     rootObserver.observe(document.body, { childList: true, subtree: true });
   }
 
+  /**
+   * A line of explanation under the chip bar. With no auto-scrolling, an
+   * empty-looking grid is a normal state rather than a bug, and the viewer
+   * needs to be told which normal state they are in.
+   */
+  function noteText() {
+    if (!stats.total) return '';
+
+    if (!stats.unwatched) {
+      return `Every loaded video (${stats.total}) is watched. Scroll down to load more.`;
+    }
+
+    if (!stats.watched) {
+      return `Nothing loaded (${stats.total}) is marked as watched \u2014 check that you are signed in and watch history is on.`;
+    }
+
+    return `Hiding ${stats.watched} watched. Scroll down to load more.`;
+  }
+
+  function removeNote() {
+    if (noteNode) noteNode.remove();
+    noteNode = null;
+  }
+
+  function updateNote(contents) {
+    const text = enabled ? noteText() : '';
+
+    if (!text) {
+      removeNote();
+      return;
+    }
+
+    if (!noteNode) {
+      noteNode = document.createElement('p');
+      noteNode.className = 'ytu-note';
+    }
+
+    noteNode.textContent = text;
+
+    // Just above the grid, and outside #contents on purpose: writing it
+    // inside would retrigger the observer that watches the grid.
+    if (noteNode.parentElement !== contents.parentElement) {
+      contents.parentElement.insertBefore(noteNode, contents);
+    }
+  }
+
   /** Leave the page exactly as we found it when navigating away. */
   function teardown() {
     chip.remove();
+    removeNote();
 
     if (gridObserver) gridObserver.disconnect();
     if (rootObserver) rootObserver.disconnect();
@@ -124,6 +173,7 @@
     contents.classList.toggle('ytu-filtering', enabled);
     chip.setLabel(enabled ? `Unwatched · ${stats.unwatched}` : 'Unwatched');
     chip.setActive(enabled);
+    updateNote(contents);
   }
 
   function toggle() {
