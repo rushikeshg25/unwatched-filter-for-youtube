@@ -59,6 +59,18 @@
   display: none !important;
 }
 
+/* Home for the chip on channels that have no sort chips to sit beside. */
+.ytu-standalone-bar {
+  display: flex;
+  align-items: center;
+  margin: 0 0 12px;
+}
+
+.ytu-standalone-bar .ytu-chip,
+.ytu-standalone-bar .ytu-chip--bare {
+  margin-left: 0;
+}
+
 /* Status line under the chip bar: why the grid looks empty. */
 .ytu-note {
   margin: 8px 0 0;

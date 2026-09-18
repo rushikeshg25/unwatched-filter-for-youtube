@@ -20,6 +20,9 @@ globalThis.YTUnwatched = globalThis.YTUnwatched || {};
   let labelNode = null;
   let handler = null;
 
+  /** className we last borrowed, so an unchanged bar costs no DOM writes. */
+  let borrowedFrom = null;
+
   /** True for the chip that is currently active, e.g. Latest. */
   function isSelected(node) {
     return (
@@ -52,15 +55,26 @@ globalThis.YTUnwatched = globalThis.YTUnwatched || {};
     return null;
   }
 
-  /** Copy a template chip's look onto our button. */
+  /**
+   * Copy a template chip's look onto our button, or fall back to the
+   * self-contained styling when there is no chip to copy from.
+   *
+   * Writing className is skipped when the source has not changed: this runs
+   * on every pass, and a needless write would both churn the DOM and drop
+   * the active class that setActive() owns.
+   */
   function applyTemplate(template) {
+    const source = template ? template.className : '';
+    if (source === borrowedFrom) return;
+    borrowedFrom = source;
+
     if (!template) {
       element.className = 'ytu-chip ytu-chip--bare';
       labelNode.className = '';
       return;
     }
 
-    element.className = `${template.className} ytu-chip`;
+    element.className = `${source} ytu-chip`;
 
     const innerText = template.querySelector('[class*="text-content"], [class*="text"]');
     labelNode.className = innerText ? innerText.className : '';
@@ -91,10 +105,7 @@ globalThis.YTUnwatched = globalThis.YTUnwatched || {};
     handler = onToggle;
     if (!element) build();
 
-    const template = findTemplate(bar);
-    if (template || element.classList.contains('ytu-chip--bare')) {
-      applyTemplate(template);
-    }
+    applyTemplate(findTemplate(bar));
 
     if (element.parentElement !== bar) bar.appendChild(element);
     return element;

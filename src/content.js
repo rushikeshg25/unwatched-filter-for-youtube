@@ -31,6 +31,7 @@
   let stats = { total: 0, watched: 0, unwatched: 0 };
 
   let noteNode = null;
+  let standaloneBar = null;
 
   function onVideosPage() {
     return VIDEOS_PATH.test(location.pathname);
@@ -116,10 +117,41 @@
     }
   }
 
+  /**
+   * Where the chip should live. Channels with only a handful of videos get
+   * no sort chips at all, so rather than dropping the feature the chip gets
+   * a bar of its own just above the grid.
+   */
+  function chipHome(contents) {
+    const bar = selectors.findChipBar();
+
+    if (bar) {
+      if (standaloneBar) {
+        standaloneBar.remove();
+        standaloneBar = null;
+      }
+      return bar;
+    }
+
+    if (!standaloneBar) {
+      standaloneBar = document.createElement('div');
+      standaloneBar.className = 'ytu-standalone-bar';
+    }
+
+    if (standaloneBar.parentElement !== contents.parentElement) {
+      contents.parentElement.insertBefore(standaloneBar, contents);
+    }
+
+    return standaloneBar;
+  }
+
   /** Leave the page exactly as we found it when navigating away. */
   function teardown() {
     chip.remove();
     removeNote();
+
+    if (standaloneBar) standaloneBar.remove();
+    standaloneBar = null;
 
     if (gridObserver) gridObserver.disconnect();
     if (rootObserver) rootObserver.disconnect();
@@ -142,14 +174,13 @@
       return;
     }
 
-    const bar = selectors.findChipBar();
-    if (bar) chip.ensure(bar, toggle);
-
     const contents = selectors.findGridContents();
     if (!contents) {
       watchForGrid();
       return;
     }
+
+    chip.ensure(chipHome(contents), toggle);
 
     if (contents !== observedGrid || !observedGrid.isConnected) {
       watchGrid(contents);
