@@ -10,10 +10,12 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 
-version="$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")"
+node scripts/build.mjs
+
+version="$(node -p "require('./manifest.json').version")"
 out="yt-unwatched-v${version}.zip"
 
 rm -f "$out"
-zip -qr "$out" manifest.json src icons -x '*.DS_Store'
+zip -qr "$out" manifest.json dist icons -x '*.DS_Store'
 
 echo "$out"

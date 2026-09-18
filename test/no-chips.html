@@ -5,7 +5,7 @@
   way YouTube does it, without a page load.
 -->
 <html>
-  <head><meta charset="utf-8" /><link rel="stylesheet" href="/src/content.css" /></head>
+  <head><meta charset="utf-8" /><link rel="stylesheet" href="/dist/content.css" /></head>
   <body>
     <ytd-rich-grid-renderer id="grid">
       <div id="contents">
@@ -17,10 +17,7 @@
     <pre id="result">no result</pre>
 
     <script src="/test/harness.js"></script>
-    <script src="/src/selectors.js"></script>
-    <script src="/src/watched.js"></script>
-    <script src="/src/chip.js"></script>
-    <script src="/src/content.js"></script>
+    <script src="/dist/content.js"></script>
     <script>
       const chip = document.querySelector('[data-ytu-chip]');
 

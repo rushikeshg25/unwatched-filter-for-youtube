@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Smoke test: loads the content scripts against fixture pages in headless
+# Smoke test: builds the bundle, loads it against fixture pages in headless
 # Chrome and checks the filter behaves. Verifies this extension's logic, not
 # that YouTube still ships the markup the fixtures imitate.
 #
@@ -22,6 +22,8 @@ if [ -z "$chrome" ] || [ ! -x "$chrome" ]; then
   echo "Chrome not found. Set CHROME=/path/to/chrome" >&2
   exit 2
 fi
+
+node scripts/build.mjs
 
 python3 test/serve.py "$port" &
 server=$!

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serve the fixtures and the extension sources over http for the smoke test.
+"""Serve the fixtures and the built bundle over http for the smoke test.
 
 Every path returns a fixture page, so the fixture can be requested at a URL
 shaped like a real channel (/@name/videos) and the content script's route
@@ -20,7 +20,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         path, _, query = self.path.partition("?")
 
-        if path.startswith("/src/") or path.startswith("/test/"):
+        if path.startswith("/dist/") or path.startswith("/test/"):
             target = ROOT / path.lstrip("/")
         else:
             name = query.split("f=")[1].split("&")[0] if "f=" in query else "grid.html"
