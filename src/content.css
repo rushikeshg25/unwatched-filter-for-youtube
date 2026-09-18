@@ -1,0 +1,69 @@
+/*
+ * Styling for the Unwatched chip and the filtered grid.
+ *
+ * The chip normally borrows YouTube's own chip classes, so the rules here
+ * only do three things: keep it laid out correctly in the bar, paint the
+ * active state, and provide a complete fallback look (.ytu-chip--bare) for
+ * when no template chip was available to borrow from.
+ */
+
+.ytu-chip {
+  flex: 0 0 auto;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+/* Fallback appearance, close to a YouTube chip, used only when the class
+   borrow found no template. Deliberately unset first so a half-applied
+   YouTube class list cannot leak through. */
+.ytu-chip--bare {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 2rem;
+  white-space: nowrap;
+  cursor: pointer;
+  flex: 0 0 auto;
+  margin-left: 8px;
+  background: var(--yt-spec-badge-chip-background, rgba(0, 0, 0, 0.05));
+  color: var(--yt-spec-text-primary, #0f0f0f);
+}
+
+/* Active state mirrors how YouTube paints a selected chip: inverted in both
+   themes. !important because the borrowed classes set the same properties. */
+.ytu-chip--active {
+  background: var(--yt-spec-text-primary, #0f0f0f) !important;
+  color: var(--yt-spec-text-primary-inverse, #ffffff) !important;
+}
+
+.ytu-chip:focus-visible {
+  outline: 2px solid var(--yt-spec-call-to-action, #065fd4);
+  outline-offset: 2px;
+}
+
+/* The filter itself. The grid is flex-wrap, so hidden cards simply reflow. */
+.ytu-filtering ytd-rich-item-renderer.ytu-watched,
+.ytu-filtering ytd-grid-video-renderer.ytu-watched {
+  display: none !important;
+}
+
+/* Older row-based grids: drop a row once every card in it is hidden. */
+.ytu-filtering ytd-rich-grid-row.ytu-watched-row {
+  display: none !important;
+}
+
+/* Status line under the chip bar: why the grid looks empty. */
+.ytu-note {
+  margin: 8px 0 0;
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  color: var(--yt-spec-text-secondary, #606060);
+}
