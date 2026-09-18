@@ -27,6 +27,9 @@
   let timer = 0;
   let lastHref = location.href;
 
+  /** Result of the last pass, also used by the diagnostics helper. */
+  let stats = { total: 0, watched: 0, unwatched: 0 };
+
   function onVideosPage() {
     return VIDEOS_PATH.test(location.pathname);
   }
@@ -103,12 +106,23 @@
       watchGrid(contents);
     }
 
-    for (const item of selectors.getGridItems(contents)) {
-      item.classList.toggle('ytu-watched', watched.isWatched(item));
+    const items = selectors.getGridItems(contents);
+    let watchedCount = 0;
+
+    for (const item of items) {
+      const seen = watched.isWatched(item);
+      item.classList.toggle('ytu-watched', seen);
+      if (seen) watchedCount += 1;
     }
 
+    stats = {
+      total: items.length,
+      watched: watchedCount,
+      unwatched: items.length - watchedCount,
+    };
+
     contents.classList.toggle('ytu-filtering', enabled);
-    chip.setLabel('Unwatched');
+    chip.setLabel(enabled ? `Unwatched · ${stats.unwatched}` : 'Unwatched');
     chip.setActive(enabled);
   }
 
