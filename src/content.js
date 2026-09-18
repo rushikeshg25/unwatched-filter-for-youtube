@@ -196,6 +196,48 @@
     }
   }
 
+  /**
+   * Console helper for when YouTube changes its markup. Run
+   * __ytUnwatched.report() from the DevTools console with the context
+   * switched to this extension, and it prints which selectors still match.
+   */
+  globalThis.__ytUnwatched = {
+    get enabled() {
+      return enabled;
+    },
+    get stats() {
+      return { ...stats };
+    },
+    toggle,
+    refresh: apply,
+    report() {
+      const contents = selectors.findGridContents();
+      const items = contents ? selectors.getGridItems(contents) : [];
+
+      const progressSelectorMatches = {};
+      for (const selector of watched.PROGRESS_SELECTORS) {
+        progressSelectorMatches[selector] = items.filter(
+          (item) => item.querySelector(selector),
+        ).length;
+      }
+
+      const summary = {
+        onVideosPage: onVideosPage(),
+        chipBarFound: Boolean(selectors.findChipBar()),
+        chipAttached: Boolean(chip.element && chip.element.isConnected),
+        gridFound: Boolean(contents),
+        cardsLoaded: items.length,
+        watched: stats.watched,
+        unwatched: stats.unwatched,
+        filtering: enabled,
+      };
+
+      console.table(summary);
+      console.table(progressSelectorMatches);
+      return { ...summary, progressSelectorMatches };
+    },
+  };
+
   document.addEventListener('yt-navigate-finish', onNavigate);
   document.addEventListener('yt-page-data-updated', onNavigate);
   window.addEventListener('popstate', onNavigate);
