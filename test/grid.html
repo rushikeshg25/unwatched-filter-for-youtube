@@ -1,0 +1,106 @@
+<!doctype html>
+<!--
+  A channel Videos tab with sort chips and a mix of watched and unwatched
+  cards, in both the current view-model markup and the older Polymer markup.
+
+  This exercises the filter's logic against the markup it expects. It cannot
+  tell you that YouTube still ships that markup -- only loading the extension
+  on a real channel does that.
+-->
+<html>
+  <head><meta charset="utf-8" /><link rel="stylesheet" href="/src/content.css" /></head>
+  <body>
+    <ytd-feed-filter-chip-bar-renderer>
+      <div id="chips">
+        <chip-view-model aria-selected="true">
+          <button class="yt-spec-button-shape-next yt-spec-button-shape-next--selected">
+            <span class="yt-spec-button-shape-next__button-text-content">Latest</span>
+          </button>
+        </chip-view-model>
+        <chip-view-model>
+          <button class="yt-spec-button-shape-next yt-spec-button-shape-next--tonal">
+            <span class="yt-spec-button-shape-next__button-text-content">Popular</span>
+          </button>
+        </chip-view-model>
+        <chip-view-model>
+          <button class="yt-spec-button-shape-next yt-spec-button-shape-next--tonal">
+            <span class="yt-spec-button-shape-next__button-text-content">Oldest</span>
+          </button>
+        </chip-view-model>
+      </div>
+    </ytd-feed-filter-chip-bar-renderer>
+
+    <ytd-rich-grid-renderer>
+      <div id="contents">
+        <ytd-rich-item-renderer id="v1"><yt-lockup-view-model>
+          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 43%;"></div>
+        </yt-lockup-view-model></ytd-rich-item-renderer>
+
+        <ytd-rich-item-renderer id="v2"><yt-lockup-view-model>never opened</yt-lockup-view-model></ytd-rich-item-renderer>
+
+        <ytd-rich-item-renderer id="v3"><yt-lockup-view-model>
+          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 100%;"></div>
+        </yt-lockup-view-model></ytd-rich-item-renderer>
+
+        <ytd-rich-item-renderer id="v4"><yt-lockup-view-model>never opened</yt-lockup-view-model></ytd-rich-item-renderer>
+
+        <ytd-rich-item-renderer id="v5">
+          <ytd-thumbnail-overlay-resume-playback-renderer>
+            <div id="progress" style="width: 88%;"></div>
+          </ytd-thumbnail-overlay-resume-playback-renderer>
+        </ytd-rich-item-renderer>
+
+        <ytd-rich-item-renderer id="v6"><yt-lockup-view-model>
+          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 0%;"></div>
+        </yt-lockup-view-model></ytd-rich-item-renderer>
+      </div>
+    </ytd-rich-grid-renderer>
+
+    <pre id="result">no result</pre>
+
+    <script src="/test/harness.js"></script>
+    <script src="/src/selectors.js"></script>
+    <script src="/src/watched.js"></script>
+    <script src="/src/chip.js"></script>
+    <script src="/src/content.js"></script>
+    <script>
+      const chip = document.querySelector('[data-ytu-chip]');
+      const hidden = () =>
+        Array.from(document.querySelectorAll('ytd-rich-item-renderer'))
+          .filter((node) => getComputedStyle(node).display === 'none')
+          .map((node) => node.id)
+          .join(',');
+
+      T.is('chip is injected', Boolean(chip), true);
+      T.is('chip sits after the last sort chip', chip.parentElement.lastElementChild === chip, true);
+      T.is('borrows an unselected chip', chip.className.includes('--tonal'), true);
+      T.is('does not borrow the selected chip', chip.className.includes('--selected'), false);
+      T.is('label while off', chip.textContent, 'Unwatched');
+      T.is('nothing hidden while off', hidden(), '');
+
+      chip.click();
+
+      T.is('label while on', chip.textContent, 'Unwatched · 3');
+      T.is('aria-pressed while on', chip.getAttribute('aria-pressed'), 'true');
+      T.is('active styling while on', chip.classList.contains('ytu-chip--active'), true);
+      T.is('watched cards hidden, 0% kept', hidden(), 'v1,v3,v5');
+      T.is('note explains the filtering', document.querySelector('.ytu-note').textContent,
+        'Hiding 3 watched. Scroll down to load more.');
+      T.is('note stays outside the observed grid', Boolean(document.querySelector('#contents .ytu-note')), false);
+
+      chip.click();
+
+      T.is('everything returns when off', hidden(), '');
+      T.is('note removed when off', Boolean(document.querySelector('.ytu-note')), false);
+
+      const report = __ytUnwatched.report();
+      T.is('report counts cards', report.cardsLoaded, 6);
+      T.is('report counts watched', report.watched, 3);
+      T.is('report counts unwatched', report.unwatched, 3);
+      T.is('report finds the chip bar', report.chipBarFound, true);
+      T.is('report finds the grid', report.gridFound, true);
+
+      T.done();
+    </script>
+  </body>
+</html>

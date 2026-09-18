@@ -99,10 +99,27 @@ It prints whether the page, chip bar and grid were found, how many cards are loa
 No build step and no dependencies — edit the files and press the reload button on `chrome://extensions`.
 
 ```bash
+./test/run.sh                   # smoke test in headless Chrome
 python3 scripts/make-icons.py   # regenerate icons/*.png (stdlib only)
 ./scripts/package.sh            # build the release zip
 node --check src/content.js     # syntax check any script
 ```
+
+### Tests
+
+`./test/run.sh` serves two fixture pages that imitate a channel's Videos tab
+— one with sort chips and a mix of watched and unwatched cards, one small
+channel with no chip bar and nothing watched — loads the content scripts into
+headless Chrome, and asserts on the result. It covers chip injection and
+styling, watched detection in both markup layouts (including a 0% bar, which
+is *not* watched), the status note, teardown and restore across single-page
+navigation, and that the extension stops touching the page once it settles.
+
+It tells you the filter's logic is intact. It cannot tell you YouTube still
+ships the markup the fixtures imitate — only loading the extension on a real
+channel does that, which is what `__ytUnwatched.report()` is for.
+
+Set `CHROME=/path/to/chrome` if Chrome is not at the default macOS location.
 
 ## Privacy
 

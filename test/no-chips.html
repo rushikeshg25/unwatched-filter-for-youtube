@@ -1,0 +1,72 @@
+<!doctype html>
+<!--
+  A small channel: too few videos for YouTube to render a sort chip bar, and
+  nothing marked as watched. Also covers leaving and re-entering the tab the
+  way YouTube does it, without a page load.
+-->
+<html>
+  <head><meta charset="utf-8" /><link rel="stylesheet" href="/src/content.css" /></head>
+  <body>
+    <ytd-rich-grid-renderer id="grid">
+      <div id="contents">
+        <ytd-rich-item-renderer id="v1"><yt-lockup-view-model>never opened</yt-lockup-view-model></ytd-rich-item-renderer>
+        <ytd-rich-item-renderer id="v2"><yt-lockup-view-model>never opened</yt-lockup-view-model></ytd-rich-item-renderer>
+      </div>
+    </ytd-rich-grid-renderer>
+
+    <pre id="result">no result</pre>
+
+    <script src="/test/harness.js"></script>
+    <script src="/src/selectors.js"></script>
+    <script src="/src/watched.js"></script>
+    <script src="/src/chip.js"></script>
+    <script src="/src/content.js"></script>
+    <script>
+      const chip = document.querySelector('[data-ytu-chip]');
+
+      T.is('chip appears without a sort bar', Boolean(chip), true);
+      T.is('chip gets a bar of its own', chip.parentElement.className, 'ytu-standalone-bar');
+      T.is('chip uses fallback styling', chip.classList.contains('ytu-chip--bare'), true);
+      T.is('that bar sits above the grid', chip.parentElement.nextElementSibling.id, 'contents');
+
+      chip.click();
+
+      T.is('note explains the empty result', document.querySelector('.ytu-note').textContent,
+        'Nothing loaded (2) is marked as watched — check that you are signed in and watch history is on.');
+
+      // Once settled, the extension must not touch the page again on its own:
+      // a self-triggering observer would show up here as a steady drip.
+      let mutations = 0;
+      const spy = new MutationObserver((records) => {
+        mutations += records.length;
+      });
+      spy.observe(document.getElementById('grid'), {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true,
+      });
+
+      setTimeout(() => {
+        spy.disconnect();
+        T.is('no mutations while idle', mutations, 0);
+
+        history.pushState({}, '', '/@example/featured');
+        document.dispatchEvent(new CustomEvent('yt-navigate-finish'));
+
+        T.is('chip removed on leaving', Boolean(document.querySelector('[data-ytu-chip]')), false);
+        T.is('note removed on leaving', Boolean(document.querySelector('.ytu-note')), false);
+        T.is('standalone bar removed on leaving', Boolean(document.querySelector('.ytu-standalone-bar')), false);
+        T.is('filtering class cleared on leaving', Boolean(document.querySelector('.ytu-filtering')), false);
+
+        history.pushState({}, '', '/@example/videos');
+        document.dispatchEvent(new CustomEvent('yt-navigate-finish'));
+
+        T.is('chip restored on return', Boolean(document.querySelector('[data-ytu-chip]')), true);
+        T.is('filter still on after return', __ytUnwatched.enabled, true);
+
+        T.done();
+      }, 1500);
+    </script>
+  </body>
+</html>
