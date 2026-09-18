@@ -234,7 +234,9 @@ function apply(): void {
   };
 
   contents.classList.toggle('ytu-filtering', enabled);
-  chip.setLabel(enabled ? `Unwatched · ${stats.unwatched}` : 'Unwatched');
+  // No count: the grid is lazy-loaded, so any number here would only ever
+  // describe the videos loaded so far and would read as the channel total.
+  chip.setLabel('Unwatched');
   chip.setActive(enabled);
   updateNote(contents);
 }

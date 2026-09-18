@@ -9,9 +9,9 @@ A Chrome extension that adds an **Unwatched** filter beside Latest, Popular and 
 ![Runtime dependencies: none](https://img.shields.io/badge/runtime%20dependencies-none-brightgreen.svg)
 
 ```
-┌────────┐ ┌─────────┐ ┌────────┐   ┌────────────────┐
-│ Latest │ │ Popular │ │ Oldest │   │ Unwatched · 12 │  ← added by this extension
-└────────┘ └─────────┘ └────────┘   └────────────────┘
+┌────────┐ ┌─────────┐ ┌────────┐   ┌───────────┐
+│ Latest │ │ Popular │ │ Oldest │   │ Unwatched │  ← added by this extension
+└────────┘ └─────────┘ └────────┘   └───────────┘
 ```
 
 ## The problem
@@ -47,7 +47,7 @@ The extension is not on the Chrome Web Store, so Chrome will show the usual "loa
 
 Open any channel's Videos tab — `youtube.com/@channel/videos` — and click **Unwatched**.
 
-- Videos with any watch progress are hidden; the chip shows how many are left.
+- Videos with any watch progress are hidden.
 - Click it again to bring everything back.
 - The filter stays on while you switch between Latest, Popular and Oldest, and while you move between channels in the same tab.
 - Scroll to load more videos; new ones are filtered as they arrive.

@@ -62,12 +62,13 @@
       T.is('chip starts with the unselected look', oursStyled.className, styled(idleChip).className);
       T.is('chip paints like an unselected chip', paint(oursStyled), paint(styled(idleChip)));
       T.is('label while off', ours.textContent.trim(), 'Unwatched');
+      T.is('label carries no count', /[0-9]/.test(ours.textContent), false);
       T.is('nothing hidden while off', hidden(), '');
 
       ours.click();
 
       T.is('chip paints like the selected chip', paint(oursStyled), paint(styled(selectedChip)));
-      T.is('label while on', ours.textContent.trim(), 'Unwatched \u00b7 3');
+      T.is('label while on', ours.textContent.trim(), 'Unwatched');
       T.is('aria-pressed while on', ours.querySelector('button').getAttribute('aria-pressed'), 'true');
       T.is('watched cards hidden, 0% kept', hidden(), 'v1,v3,v5');
       T.is('note explains the filtering', document.querySelector('.ytu-note').textContent,
