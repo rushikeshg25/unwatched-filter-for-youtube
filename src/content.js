@@ -25,6 +25,7 @@
   let rootObserver = null;
   let observedGrid = null;
   let timer = 0;
+  let lastHref = location.href;
 
   function onVideosPage() {
     return VIDEOS_PATH.test(location.pathname);
@@ -64,12 +65,30 @@
     rootObserver.observe(document.body, { childList: true, subtree: true });
   }
 
+  /** Leave the page exactly as we found it when navigating away. */
+  function teardown() {
+    chip.remove();
+
+    if (gridObserver) gridObserver.disconnect();
+    if (rootObserver) rootObserver.disconnect();
+    gridObserver = null;
+    rootObserver = null;
+    observedGrid = null;
+
+    for (const node of document.querySelectorAll('.ytu-filtering')) {
+      node.classList.remove('ytu-filtering');
+    }
+  }
+
   /**
    * Tag every loaded card as watched or not and switch the grid's filtering
    * class. The hiding itself is done in CSS, so re-running this is cheap.
    */
   function apply() {
-    if (!onVideosPage()) return;
+    if (!onVideosPage()) {
+      teardown();
+      return;
+    }
 
     const bar = selectors.findChipBar();
     if (bar) chip.ensure(bar, toggle);
@@ -98,6 +117,31 @@
     apply();
   }
 
-  apply();
-  watchForGrid();
+  /**
+   * YouTube is a single-page app: the Videos tab is reached without a page
+   * load, so every entry and exit arrives as one of these events.
+   */
+  function onNavigate() {
+    lastHref = location.href;
+
+    if (onVideosPage()) {
+      apply();
+      watchForGrid();
+    } else {
+      teardown();
+    }
+  }
+
+  document.addEventListener('yt-navigate-finish', onNavigate);
+  document.addEventListener('yt-page-data-updated', onNavigate);
+  window.addEventListener('popstate', onNavigate);
+
+  // Safety net: those events are YouTube's own and could be renamed. A URL
+  // comparison once a second costs nothing and keeps the chip from going
+  // missing if that ever happens.
+  setInterval(() => {
+    if (location.href !== lastHref) onNavigate();
+  }, 1000);
+
+  onNavigate();
 })();
