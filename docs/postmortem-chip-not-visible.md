@@ -11,7 +11,7 @@
 
 The chip was being injected the whole time. It was injected into the wrong
 element and dressed in a class that strips styling, so it rendered as
-unstyled text outside the row it was meant to join — easy to miss entirely.
+unstyled text outside the row it was meant to join, which is easy to miss.
 
 Both mistakes have the same origin: **the markup was inferred rather than
 read.** No part of the released code had ever been run against a page
@@ -76,8 +76,8 @@ was captured with headless Chrome directly:
   --dump-dom "https://www.youtube.com/@sidemenreacts/videos" > real.html
 ```
 
-A first attempt with `--virtual-time-budget` returned zero bytes — YouTube's
-timers never let virtual time settle. Dropping that flag and letting the
+A first attempt with `--virtual-time-budget` returned zero bytes, because
+YouTube's timers never let virtual time settle. Dropping that flag and letting the
 page reach `load` produced 1.7 MB of rendered DOM.
 
 That snapshot was then turned into a test bench:
@@ -104,7 +104,7 @@ That snapshot was then turned into a test bench:
    0  any #chips
 ```
 
-The grid selectors were right. Every `#chips` selector matched nothing —
+The grid selectors were right. Every `#chips` selector matched nothing:
 `#chips` does not exist on this page at all. Only the last fallback,
 `chip-bar-view-model`, matched, and it matched the **host** element.
 
@@ -140,24 +140,24 @@ borrowed classes: ytChipShapeButtonReset ytu-chip
 ```
 
 That is the bug, in three lines. The chip existed, sat outside the scroll
-container, and wore the reset class — a class whose entire job is to remove
+container, and wore the reset class, a class whose entire job is to remove
 button styling.
 
 ---
 
 ## 5. Root causes
 
-**Cause 1 — placement by container name.** `findChipBar()` matched the
+**Cause 1: placement by container name.** `findChipBar()` matched the
 container by name and the winning name was the bar's host element, whose
 child is a scroll container rather than the chips. Anything appended there
 lands beside the row, not on it.
 
-**Cause 2 — styling copied from the wrong element.** The code borrowed the
+**Cause 2: styling copied from the wrong element.** The code borrowed the
 class list of a chip's `<button>`. On this markup that is
 `ytChipShapeButtonReset`, a reset. The chip therefore had no background, no
 radius and no padding.
 
-**Cause 3 (meta) — fixtures written from the same assumptions as the code,
+**Cause 3 (meta): fixtures written from the same assumptions as the code,
 and a runner that treated a crashed fixture as a pass.** Either alone would
 have hidden the first two.
 
@@ -167,7 +167,7 @@ The first fix rebuilt the chip's element chain but located the visual
 element by descending to the deepest first child. On real markup that walks
 *past* the styled div into `yt-touch-feedback-shape`, whose `className` is
 empty. Every chip then looked identical, so selected state could not be
-detected and the chip copied whichever chip came first — which is the
+detected and the chip copied whichever chip came first, which is the
 selected one. It would have shipped looking permanently switched on.
 
 This was caught only because the fix was probed against the captured DOM
@@ -227,7 +227,7 @@ real session, open a channel's Videos tab and run
 `__ytUnwatched.report()` from the DevTools console with the context switched
 to the extension: `progressSelectorMatches` shows how many cards each
 selector matched. All zero on a channel with watched videos means the class
-name has changed — that is the line to update.
+name has changed, and that is the line to update.
 
 ---
 

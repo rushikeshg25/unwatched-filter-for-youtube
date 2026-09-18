@@ -113,7 +113,7 @@ function noteText(): string {
   }
 
   if (!stats.watched) {
-    return `Nothing loaded (${stats.total}) is marked as watched — check that you are signed in and watch history is on.`;
+    return `Nothing loaded (${stats.total}) is marked as watched. Check that you are signed in and watch history is on.`;
   }
 
   return `Hiding ${stats.watched} watched. Scroll down to load more.`;

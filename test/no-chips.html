@@ -29,7 +29,7 @@
       chip.click();
 
       T.is('note explains the empty result', document.querySelector('.ytu-note').textContent,
-        'Nothing loaded (2) is marked as watched — check that you are signed in and watch history is on.');
+        'Nothing loaded (2) is marked as watched. Check that you are signed in and watch history is on.');
 
       // Once settled, the extension must not touch the page again on its own:
       // a self-triggering observer would show up here as a steady drip.

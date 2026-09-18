@@ -39,20 +39,20 @@ npm run build
 
 Then load the cloned folder with **Load unpacked**, as above. Chrome loads
 `dist/`, which is built from the TypeScript sources and is not checked in, so
-the build step is required — the release zip is the way to skip it.
+the build step is required. The release zip is the way to skip it.
 
 The extension is not on the Chrome Web Store, so Chrome will show the usual "loaded in developer mode" notice.
 
 ## Use it
 
-Open any channel's Videos tab — `youtube.com/@channel/videos` — and click **Unwatched**.
+Open any channel's Videos tab (`youtube.com/@channel/videos`) and click **Unwatched**.
 
 - Videos with any watch progress are hidden.
 - Click it again to bring everything back.
 - The filter stays on while you switch between Latest, Popular and Oldest, and while you move between channels in the same tab.
 - Scroll to load more videos; new ones are filtered as they arrive.
 
-You need to be **signed in with watch history enabled** — that is where the progress bars come from. If nothing is marked as watched, the extension says so instead of silently showing you everything.
+You need to be **signed in with watch history enabled**, because that is where the progress bars come from. If nothing is marked as watched, the extension says so instead of silently showing you everything.
 
 ## What counts as "watched"
 
@@ -71,7 +71,7 @@ requests, no storage, no runtime dependencies.
 | `src/chip.ts` | Builds the Unwatched chip and keeps it in the bar |
 | `src/content.ts` | Applies the filter, follows navigation, watches for new cards |
 | `src/content.css` | Chip styling and the rule that hides watched cards |
-| `dist/content.js` | What Chrome actually loads — an unminified IIFE bundle |
+| `dist/content.js` | What Chrome actually loads: an unminified IIFE bundle |
 
 Content scripts cannot use ES module imports, which is why the sources are
 bundled rather than listed individually in the manifest. The bundle is left
@@ -93,7 +93,7 @@ These are deliberate, not oversights:
 
 - **It filters what is loaded, not the whole channel.** YouTube loads a channel's videos as you scroll, and this extension does not auto-scroll on your behalf. Scroll to see more.
 - **It trusts YouTube's progress bars.** Videos watched long ago, watched while signed out, or watched on a different account have no bar and will show up as unwatched.
-- **It depends on YouTube's private markup.** Google changes it without notice. When that happens the chip or the filtering stops working — see below.
+- **It depends on YouTube's private markup.** Google changes it without notice. When that happens the chip or the filtering stops working. See below.
 
 ## Troubleshooting
 
@@ -107,8 +107,8 @@ It prints whether the page, chip bar and grid were found, how many cards are loa
 
 | Symptom | Likely cause |
 | --- | --- |
-| No chip appears | The chip bar was not found — `chipBarFound: false` in the report. Update `CHIP_BAR` / `CHIP` in `src/selectors.js`. |
-| Chip works, nothing is ever hidden | Every progress selector matched 0 cards. Either watch history is off, or the resume-bar markup changed — update `PROGRESS_SELECTORS` in `src/watched.js`. |
+| No chip appears | The chip bar was not found: `chipBarFound: false` in the report. Update `CHIP_BAR` / `CHIP` in `src/selectors.js`. |
+| Chip works, nothing is ever hidden | Every progress selector matched 0 cards. Either watch history is off, or the resume-bar markup changed. Update `PROGRESS_SELECTORS` in `src/watched.js`. |
 | Everything disappears | Progress bars are being detected on every card. Check `progressSelectorMatches` in the report against what you actually see on screen. |
 | Chip vanishes after switching sort | The grid observer lost the container; `__ytUnwatched.refresh()` re-applies. Please open an issue with the report output. |
 
@@ -132,15 +132,15 @@ After a rebuild, press the reload button on the extension's card in
 ### Tests
 
 `npm test` type-checks, builds, then serves two fixture pages that imitate a channel's Videos tab
-— one with sort chips and a mix of watched and unwatched cards, one small
-channel with no chip bar and nothing watched — loads the built bundle into
+(one with sort chips and a mix of watched and unwatched cards, one small
+channel with no chip bar and nothing watched), loads the built bundle into
 headless Chrome, and asserts on the result. It covers chip injection and
 styling, watched detection in both markup layouts (including a 0% bar, which
 is *not* watched), the status note, teardown and restore across single-page
 navigation, and that the extension stops touching the page once it settles.
 
 It tells you the filter's logic is intact. It cannot tell you YouTube still
-ships the markup the fixtures imitate — only loading the extension on a real
+ships the markup the fixtures imitate. Only loading the extension on a real
 channel does that, which is what `__ytUnwatched.report()` is for.
 
 Set `CHROME=/path/to/chrome` if Chrome is not at the default macOS location.
