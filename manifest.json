@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Unwatched Filter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Adds an Unwatched filter beside Latest, Popular and Oldest on any YouTube channel's Videos tab.",
   "icons": {
     "16": "icons/icon16.png",

@@ -1,6 +1,6 @@
 {
   "name": "yt-unwatched",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "Chrome extension that adds an Unwatched filter to any YouTube channel's Videos tab",
   "license": "MIT",
