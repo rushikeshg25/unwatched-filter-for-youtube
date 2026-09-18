@@ -83,6 +83,10 @@ Two more details worth knowing if you plan to change it:
 - **The chip borrows styling, it is not a clone.** Cloning one of YouTube's `<chip-view-model>` elements gets the copy upgraded by YouTube's own runtime, which can re-bind YouTube's tap handler to it. Instead the chip is a plain `<button>` that copies the class names off an *unselected* sibling chip, with a self-contained fallback in CSS if that fails.
 - **Selectors come in pairs.** YouTube A/B tests a new view-model layout (`richItemRenderer` → `lockupViewModel`) against the older Polymer one, so every selector lists the current form first and keeps the old one as a fallback. Nothing matches on visible text, because chip labels are localised.
 
+A note on how those selectors were arrived at, and on a bug where the chip
+rendered invisibly because they were guessed rather than read, is in
+[docs/postmortem-chip-not-visible.md](docs/postmortem-chip-not-visible.md).
+
 ## Limitations
 
 These are deliberate, not oversights:
