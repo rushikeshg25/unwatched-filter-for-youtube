@@ -101,7 +101,7 @@ globalThis.YTUnwatched = globalThis.YTUnwatched || {};
   }
 
   function setLabel(text) {
-    if (labelNode) labelNode.textContent = text;
+    if (labelNode && labelNode.textContent !== text) labelNode.textContent = text;
   }
 
   function setActive(active) {

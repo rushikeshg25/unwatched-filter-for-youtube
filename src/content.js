@@ -107,7 +107,7 @@
       noteNode.className = 'ytu-note';
     }
 
-    noteNode.textContent = text;
+    if (noteNode.textContent !== text) noteNode.textContent = text;
 
     // Just above the grid, and outside #contents on purpose: writing it
     // inside would retrigger the observer that watches the grid.
@@ -190,7 +190,6 @@
 
     if (onVideosPage()) {
       apply();
-      watchForGrid();
     } else {
       teardown();
     }
