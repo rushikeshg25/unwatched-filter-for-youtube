@@ -1,0 +1,19 @@
+{
+  "name": "yt-unwatched",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Chrome extension that adds an Unwatched filter to any YouTube channel's Videos tab",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && npm run build && ./test/run.sh",
+    "package": "./scripts/package.sh"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
