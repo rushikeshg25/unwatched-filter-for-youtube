@@ -4,8 +4,9 @@ A Chrome extension that adds an **Unwatched** filter beside Latest, Popular and 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4.svg)](manifest.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg)](tsconfig.json)
 [![Permissions: none](https://img.shields.io/badge/permissions-none-brightgreen.svg)](manifest.json)
-![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
+![Runtime dependencies: none](https://img.shields.io/badge/runtime%20dependencies-none-brightgreen.svg)
 
 ```
 ┌────────┐ ┌─────────┐ ┌────────┐   ┌────────────────┐
@@ -31,9 +32,14 @@ This extension reads that same progress bar in bulk and hides everything that ha
 
 ```bash
 git clone https://github.com/rushikeshg25/yt-unwatched.git
+cd yt-unwatched
+npm install
+npm run build
 ```
 
-Then load the cloned folder with **Load unpacked**, as above.
+Then load the cloned folder with **Load unpacked**, as above. Chrome loads
+`dist/`, which is built from the TypeScript sources and is not checked in, so
+the build step is required — the release zip is the way to skip it.
 
 The extension is not on the Chrome Web Store, so Chrome will show the usual "loaded in developer mode" notice.
 
@@ -54,17 +60,25 @@ Any progress at all. A video you opened for ten seconds is a video you have alre
 
 ## How it works
 
-The extension is four small content scripts and a stylesheet. No background worker, no network requests, no storage.
+The extension is four small TypeScript modules and a stylesheet, bundled by
+esbuild into a single content script. No background worker, no network
+requests, no storage, no runtime dependencies.
 
 | File | Responsibility |
 | --- | --- |
-| `src/selectors.js` | Finds the chip bar and the video grid |
-| `src/watched.js` | Reads the thumbnail resume bar to decide if a card is watched |
-| `src/chip.js` | Builds the Unwatched chip and keeps it in the bar |
-| `src/content.js` | Applies the filter, follows navigation, watches for new cards |
+| `src/selectors.ts` | Finds the chip bar and the video grid |
+| `src/watched.ts` | Reads the thumbnail resume bar to decide if a card is watched |
+| `src/chip.ts` | Builds the Unwatched chip and keeps it in the bar |
+| `src/content.ts` | Applies the filter, follows navigation, watches for new cards |
 | `src/content.css` | Chip styling and the rule that hides watched cards |
+| `dist/content.js` | What Chrome actually loads — an unminified IIFE bundle |
 
-Two details worth knowing if you plan to change it:
+Content scripts cannot use ES module imports, which is why the sources are
+bundled rather than listed individually in the manifest. The bundle is left
+unminified on purpose: an extension that reads the page you are signed into
+should stay readable to anyone who wants to check what it does.
+
+Two more details worth knowing if you plan to change it:
 
 - **The chip borrows styling, it is not a clone.** Cloning one of YouTube's `<chip-view-model>` elements gets the copy upgraded by YouTube's own runtime, which can re-bind YouTube's tap handler to it. Instead the chip is a plain `<button>` that copies the class names off an *unselected* sibling chip, with a self-contained fallback in CSS if that fails.
 - **Selectors come in pairs.** YouTube A/B tests a new view-model layout (`richItemRenderer` → `lockupViewModel`) against the older Polymer one, so every selector lists the current form first and keeps the old one as a fallback. Nothing matches on visible text, because chip labels are localised.
@@ -96,20 +110,26 @@ It prints whether the page, chip bar and grid were found, how many cards are loa
 
 ## Development
 
-No build step and no dependencies — edit the files and press the reload button on `chrome://extensions`.
+TypeScript and esbuild are the only dependencies, both dev-only.
 
 ```bash
-./test/run.sh                   # smoke test in headless Chrome
-python3 scripts/make-icons.py   # regenerate icons/*.png (stdlib only)
+npm install
+npm run build                   # bundle src/*.ts -> dist/
+npm run watch                   # rebuild on change
+npm run typecheck               # tsc --noEmit, strict
+npm test                        # typecheck + build + smoke test
 ./scripts/package.sh            # build the release zip
-node --check src/content.js     # syntax check any script
+python3 scripts/make-icons.py   # regenerate icons/*.png (stdlib only)
 ```
+
+After a rebuild, press the reload button on the extension's card in
+`chrome://extensions` to pick up the new bundle.
 
 ### Tests
 
-`./test/run.sh` serves two fixture pages that imitate a channel's Videos tab
+`npm test` type-checks, builds, then serves two fixture pages that imitate a channel's Videos tab
 — one with sort chips and a mix of watched and unwatched cards, one small
-channel with no chip bar and nothing watched — loads the content scripts into
+channel with no chip bar and nothing watched — loads the built bundle into
 headless Chrome, and asserts on the result. It covers chip injection and
 styling, watched detection in both markup layouts (including a 0% bar, which
 is *not* watched), the status note, teardown and restore across single-page
