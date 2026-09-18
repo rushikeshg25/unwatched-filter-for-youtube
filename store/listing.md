@@ -46,7 +46,7 @@ WHAT IT DOES NOT DO
 • No permissions requested
 • It filters the videos YouTube has loaded. Scroll to load more; it does not auto-scroll on your behalf.
 
-Open source under the MIT licence: https://github.com/rushikeshg25/yt-unwatched
+Open source under the MIT licence: https://github.com/rushikeshg25/unwatched-filter-for-youtube
 
 Not affiliated with, endorsed by, or sponsored by YouTube or Google.
 ```
@@ -92,14 +92,14 @@ determine creditworthiness or for lending purposes.
 **Privacy policy URL**
 
 ```
-https://github.com/rushikeshg25/yt-unwatched/blob/main/PRIVACY.md
+https://github.com/rushikeshg25/unwatched-filter-for-youtube/blob/main/PRIVACY.md
 ```
 
 ---
 
 ## Assets
 
-**Package:** `./scripts/package.sh` → `yt-unwatched-vX.Y.Z.zip`
+**Package:** `./scripts/package.sh` → `unwatched-filter-for-youtube-vX.Y.Z.zip`
 (manifest, `dist/`, `icons/` — nothing else).
 
 **Store icon:** 128×128, already in the package at `icons/icon128.png`.

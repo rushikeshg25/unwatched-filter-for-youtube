@@ -60,7 +60,7 @@ version of the extension.
 
 ## Contact
 
-Questions or concerns: https://github.com/rushikeshg25/yt-unwatched/issues
+Questions or concerns: https://github.com/rushikeshg25/unwatched-filter-for-youtube/issues
 
 ## Affiliation
 

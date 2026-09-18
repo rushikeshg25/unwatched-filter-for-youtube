@@ -24,15 +24,15 @@ This extension reads that same progress bar in bulk and hides everything that ha
 
 **From a release (recommended)**
 
-1. Download `yt-unwatched-vX.Y.Z.zip` from the [latest release](https://github.com/rushikeshg25/yt-unwatched/releases/latest) and unzip it.
+1. Download `unwatched-filter-for-youtube-vX.Y.Z.zip` from the [latest release](https://github.com/rushikeshg25/unwatched-filter-for-youtube/releases/latest) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode** (top right).
 3. Click **Load unpacked** and select the unzipped folder.
 
 **From source**
 
 ```bash
-git clone https://github.com/rushikeshg25/yt-unwatched.git
-cd yt-unwatched
+git clone https://github.com/rushikeshg25/unwatched-filter-for-youtube.git
+cd unwatched-filter-for-youtube
 npm install
 npm run build
 ```
