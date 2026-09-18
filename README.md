@@ -149,6 +149,12 @@ Set `CHROME=/path/to/chrome` if Chrome is not at the default macOS location.
 
 The extension requests **no permissions** and has no `host_permissions`; a statically declared content script needs neither. It makes no network requests, stores nothing (not even your on/off preference, which lives in memory for the life of the tab) and sends nothing anywhere. All it does is add and remove CSS classes on the page you are already looking at.
 
+## Publishing
+
+Listing copy, the privacy-practices answers and a submission checklist for
+the Chrome Web Store are in [store/listing.md](store/listing.md). The
+privacy policy is [PRIVACY.md](PRIVACY.md).
+
 ## License
 
 [MIT](LICENSE)
