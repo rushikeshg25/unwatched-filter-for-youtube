@@ -50,6 +50,12 @@ print(match.group(1).strip() if match else "FAIL  fixture produced no result")
   if printf '%s' "$output" | grep -q '^FAIL'; then
     failed=1
   fi
+
+  # A fixture that never ran is a failure, not an absence of failures.
+  if ! printf '%s' "$output" | grep -q '^PASS'; then
+    echo "FAIL  $fixture produced no passing checks"
+    failed=1
+  fi
 done
 
 echo

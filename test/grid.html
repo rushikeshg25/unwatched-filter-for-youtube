@@ -1,58 +1,29 @@
 <!doctype html>
 <!--
-  A channel Videos tab with sort chips and a mix of watched and unwatched
-  cards, in both the current view-model markup and the older Polymer markup.
+  A channel Videos tab.
 
-  This exercises the filter's logic against the markup it expects. It cannot
-  tell you that YouTube still ships that markup -- only loading the extension
-  on a real channel does that.
+  The chip bar below is not an imitation: it is the markup captured from
+  youtube.com/@sidemenreacts/videos, pasted in verbatim. An earlier version
+  of this file invented a #chips container that YouTube does not serve, and
+  the suite passed happily while the extension was broken on the real site.
+  Anything here that is invented is a bug waiting to happen.
+
+  The cards are synthetic, because the resume bar only renders for a signed-in
+  viewer with watch history -- it cannot be captured from a logged-out page.
 -->
 <html>
   <head><meta charset="utf-8" /><link rel="stylesheet" href="/dist/content.css" /></head>
   <body>
-    <ytd-feed-filter-chip-bar-renderer>
-      <div id="chips">
-        <chip-view-model aria-selected="true">
-          <button class="yt-spec-button-shape-next yt-spec-button-shape-next--selected">
-            <span class="yt-spec-button-shape-next__button-text-content">Latest</span>
-          </button>
-        </chip-view-model>
-        <chip-view-model>
-          <button class="yt-spec-button-shape-next yt-spec-button-shape-next--tonal">
-            <span class="yt-spec-button-shape-next__button-text-content">Popular</span>
-          </button>
-        </chip-view-model>
-        <chip-view-model>
-          <button class="yt-spec-button-shape-next yt-spec-button-shape-next--tonal">
-            <span class="yt-spec-button-shape-next__button-text-content">Oldest</span>
-          </button>
-        </chip-view-model>
-      </div>
-    </ytd-feed-filter-chip-bar-renderer>
-
     <ytd-rich-grid-renderer>
+      <chip-bar-view-model class="ytChipBarViewModelHost ytd-rich-grid-renderer chip-bar"><div role="tablist" class="ytChipBarViewModelChipBarScrollContainer"><div role="presentation" class="ytChipBarViewModelChipWrapper"><chip-view-model class="ytChipViewModelHost"><chip-shape class="ytChipShapeHost"><button class="ytChipShapeButtonReset" role="tab" aria-label="Latest" aria-selected="true"><div class="ytChipShapeChip ytChipShapeActive ytChipShapeOnlyTextPadding"><div>Latest</div><yt-touch-feedback-shape aria-hidden="true" class="ytSpecTouchFeedbackShapeHost ytSpecTouchFeedbackShapeTouchResponse ytSpecTouchFeedbackShapeTriggerEvents"><div class="ytSpecTouchFeedbackShapeStroke" style="border-radius: 8px;"></div><div class="ytSpecTouchFeedbackShapeFill" style="border-radius: 8px;"></div></yt-touch-feedback-shape></div></button></chip-shape></chip-view-model></div><div role="presentation" class="ytChipBarViewModelChipWrapper"><chip-view-model class="ytChipViewModelHost"><chip-shape class="ytChipShapeHost"><button class="ytChipShapeButtonReset" role="tab" aria-label="Popular" aria-selected="false"><div class="ytChipShapeChip ytChipShapeInactive ytChipShapeOnlyTextPadding"><div>Popular</div><yt-touch-feedback-shape aria-hidden="true" class="ytSpecTouchFeedbackShapeHost ytSpecTouchFeedbackShapeTouchResponse ytSpecTouchFeedbackShapeTriggerEvents"><div class="ytSpecTouchFeedbackShapeStroke" style="border-radius: 8px;"></div><div class="ytSpecTouchFeedbackShapeFill" style="border-radius: 8px;"></div></yt-touch-feedback-shape></div></button></chip-shape></chip-view-model></div><div role="presentation" class="ytChipBarViewModelChipWrapper"><chip-view-model class="ytChipViewModelHost"><chip-shape class="ytChipShapeHost"><button class="ytChipShapeButtonReset" role="tab" aria-label="Oldest" aria-selected="false"><div class="ytChipShapeChip ytChipShapeInactive ytChipShapeOnlyTextPadding"><div>Oldest</div><yt-touch-feedback-shape aria-hidden="true" class="ytSpecTouchFeedbackShapeHost ytSpecTouchFeedbackShapeTouchResponse ytSpecTouchFeedbackShapeTriggerEvents"><div class="ytSpecTouchFeedbackShapeStroke" style="border-radius: 8px;"></div><div class="ytSpecTouchFeedbackShapeFill" style="border-radius: 8px;"></div></yt-touch-feedback-shape></div></button></chip-shape></chip-view-model></div></div></chip-bar-view-model>
+
       <div id="contents">
-        <ytd-rich-item-renderer id="v1"><yt-lockup-view-model>
-          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 43%;"></div>
-        </yt-lockup-view-model></ytd-rich-item-renderer>
-
+        <ytd-rich-item-renderer id="v1"><yt-lockup-view-model><div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 43%;"></div>watched 43%</yt-lockup-view-model></ytd-rich-item-renderer>
         <ytd-rich-item-renderer id="v2"><yt-lockup-view-model>never opened</yt-lockup-view-model></ytd-rich-item-renderer>
-
-        <ytd-rich-item-renderer id="v3"><yt-lockup-view-model>
-          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 100%;"></div>
-        </yt-lockup-view-model></ytd-rich-item-renderer>
-
+        <ytd-rich-item-renderer id="v3"><yt-lockup-view-model><div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 100%;"></div>watched 100%</yt-lockup-view-model></ytd-rich-item-renderer>
         <ytd-rich-item-renderer id="v4"><yt-lockup-view-model>never opened</yt-lockup-view-model></ytd-rich-item-renderer>
-
-        <ytd-rich-item-renderer id="v5">
-          <ytd-thumbnail-overlay-resume-playback-renderer>
-            <div id="progress" style="width: 88%;"></div>
-          </ytd-thumbnail-overlay-resume-playback-renderer>
-        </ytd-rich-item-renderer>
-
-        <ytd-rich-item-renderer id="v6"><yt-lockup-view-model>
-          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 0%;"></div>
-        </yt-lockup-view-model></ytd-rich-item-renderer>
+        <ytd-rich-item-renderer id="v5"><ytd-thumbnail-overlay-resume-playback-renderer><div id="progress" style="width: 88%;"></div></ytd-thumbnail-overlay-resume-playback-renderer>legacy layout</ytd-rich-item-renderer>
+        <ytd-rich-item-renderer id="v6"><yt-lockup-view-model><div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 0%;"></div>zero progress</yt-lockup-view-model></ytd-rich-item-renderer>
       </div>
     </ytd-rich-grid-renderer>
 
@@ -61,33 +32,52 @@
     <script src="/test/harness.js"></script>
     <script src="/dist/content.js"></script>
     <script>
-      const chip = document.querySelector('[data-ytu-chip]');
+      const chips = [...document.querySelectorAll('chip-view-model')];
+      const styled = (chip) => chip.querySelector('[class*="ytChipShapeChip"]');
+      const selectedChip = chips.find((chip) => styled(chip).className.includes('Active'));
+      const idleChip = chips.find((chip) => styled(chip).className.includes('Inactive'));
+
+      const ours = document.querySelector('[data-ytu-chip]');
+      const oursStyled = ours.querySelector('[class*="ytChipShapeChip"]');
+      const paint = (el) => { const s = getComputedStyle(el); return s.backgroundColor + ' / ' + s.color; };
       const hidden = () =>
-        Array.from(document.querySelectorAll('ytd-rich-item-renderer'))
+        [...document.querySelectorAll('ytd-rich-item-renderer')]
           .filter((node) => getComputedStyle(node).display === 'none')
           .map((node) => node.id)
           .join(',');
 
-      T.is('chip is injected', Boolean(chip), true);
-      T.is('chip sits after the last sort chip', chip.parentElement.lastElementChild === chip, true);
-      T.is('borrows an unselected chip', chip.className.includes('--tonal'), true);
-      T.is('does not borrow the selected chip', chip.className.includes('--selected'), false);
-      T.is('label while off', chip.textContent, 'Unwatched');
+      T.is('chip is injected', Boolean(ours), true);
+
+      /* The bug this suite missed: the chip was appended to the bar host,
+         which put it outside the scroll container the chips are laid out in. */
+      T.is('chip joins the row the real chips are in',
+        ours.parentElement.parentElement === idleChip.parentElement.parentElement, true);
+      T.is('chip wrapper matches YouTube\'s',
+        ours.parentElement.className.includes(idleChip.parentElement.className), true);
+      T.is('chip is last on the row',
+        ours.parentElement.parentElement.lastElementChild === ours.parentElement, true);
+
+      /* The other bug: state was read from an element that has no classes,
+         so the chip copied the selected chip and looked permanently on. */
+      T.is('chip starts with the unselected look', oursStyled.className, styled(idleChip).className);
+      T.is('chip paints like an unselected chip', paint(oursStyled), paint(styled(idleChip)));
+      T.is('label while off', ours.textContent.trim(), 'Unwatched');
       T.is('nothing hidden while off', hidden(), '');
 
-      chip.click();
+      ours.click();
 
-      T.is('label while on', chip.textContent, 'Unwatched · 3');
-      T.is('aria-pressed while on', chip.getAttribute('aria-pressed'), 'true');
-      T.is('active styling while on', chip.classList.contains('ytu-chip--active'), true);
+      T.is('chip paints like the selected chip', paint(oursStyled), paint(styled(selectedChip)));
+      T.is('label while on', ours.textContent.trim(), 'Unwatched \u00b7 3');
+      T.is('aria-pressed while on', ours.querySelector('button').getAttribute('aria-pressed'), 'true');
       T.is('watched cards hidden, 0% kept', hidden(), 'v1,v3,v5');
       T.is('note explains the filtering', document.querySelector('.ytu-note').textContent,
         'Hiding 3 watched. Scroll down to load more.');
       T.is('note stays outside the observed grid', Boolean(document.querySelector('#contents .ytu-note')), false);
 
-      chip.click();
+      ours.click();
 
       T.is('everything returns when off', hidden(), '');
+      T.is('chip returns to the unselected look', paint(oursStyled), paint(styled(idleChip)));
       T.is('note removed when off', Boolean(document.querySelector('.ytu-note')), false);
 
       const report = __ytUnwatched.report();
