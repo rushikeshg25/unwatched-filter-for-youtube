@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """Generate the extension icons.
 
-Written against the standard library only (zlib + struct) so the icons can be
-regenerated on any machine with Python, without pulling in an image library
-or committing a binary design file. Run from the repository root:
+The icon is a short list whose top row is marked with a bright dot and the
+rest faded: the unwatched one standing out from the watched ones.
+
+It deliberately avoids a red rounded square with a white play triangle.
+That is YouTube's mark, and an extension that borrows it invites a
+trademark rejection from the Chrome Web Store however innocent the intent.
+
+Standard library only (zlib + struct), so the icons can be regenerated on
+any machine with Python, without an image library or a binary design file:
 
     python3 scripts/make-icons.py
 """
@@ -15,53 +21,65 @@ from pathlib import Path
 SIZES = (16, 48, 128)
 SUPERSAMPLE = 4
 
-YOUTUBE_RED = (255, 0, 0, 255)
-WHITE = (255, 255, 255, 255)
-TRANSPARENT = (0, 0, 0, 0)
+BACKGROUND = (79, 70, 229)      # indigo, nothing like YouTube red
+UNWATCHED = (251, 191, 36)      # amber: the row that stands out
+WATCHED = (255, 255, 255)       # white, faded down below
 
 CORNER_RADIUS = 0.22
-TRIANGLE = ((0.34, 0.26), (0.34, 0.74), (0.71, 0.50))
-DOT_CENTRE = (0.78, 0.22)
-DOT_RADIUS = 0.15
+ROW_Y = (0.31, 0.50, 0.69)
+ROW_ALPHA = (1.0, 0.45, 0.45)   # top row bright, the watched ones faded
+
+DOT_X = 0.28
+DOT_RADIUS = 0.072
+BAR_X0, BAR_X1 = 0.42, 0.76
+BAR_HALF_HEIGHT = 0.045
 
 
-def in_rounded_square(x, y, radius=CORNER_RADIUS):
-    """Unit-square rounded-rectangle test."""
-    cx = min(max(x, radius), 1.0 - radius)
-    cy = min(max(y, radius), 1.0 - radius)
+def in_rounded_rect(x, y, x0, y0, x1, y1, radius):
+    cx = min(max(x, x0 + radius), x1 - radius)
+    cy = min(max(y, y0 + radius), y1 - radius)
+    if x0 <= x <= x1 and y0 <= y <= y1:
+        if cx == x or cy == y:
+            return True
     dx, dy = x - cx, y - cy
     return dx * dx + dy * dy <= radius * radius
 
 
-def in_triangle(x, y, triangle=TRIANGLE):
-    (ax, ay), (bx, by), (cx, cy) = triangle
-
-    def side(px, py, qx, qy):
-        return (qx - px) * (y - py) - (qy - py) * (x - px)
-
-    d1 = side(ax, ay, bx, by)
-    d2 = side(bx, by, cx, cy)
-    d3 = side(cx, cy, ax, ay)
-    has_neg = d1 < 0 or d2 < 0 or d3 < 0
-    has_pos = d1 > 0 or d2 > 0 or d3 > 0
-    return not (has_neg and has_pos)
+def in_circle(x, y, cx, cy, radius):
+    dx, dy = x - cx, y - cy
+    return dx * dx + dy * dy <= radius * radius
 
 
-def in_dot(x, y):
-    dx = x - DOT_CENTRE[0]
-    dy = y - DOT_CENTRE[1]
-    return dx * dx + dy * dy <= DOT_RADIUS * DOT_RADIUS
+def over(src, src_alpha, dst):
+    """Composite src over dst, both opaque RGB triples."""
+    return tuple(round(s * src_alpha + d * (1 - src_alpha)) for s, d in zip(src, dst))
 
 
 def shade(x, y):
-    """Colour of the unit-square point (x, y): a play button, unread dot."""
-    if in_dot(x, y):
-        return WHITE
-    if not in_rounded_square(x, y):
-        return TRANSPARENT
-    if in_triangle(x, y):
-        return WHITE
-    return YOUTUBE_RED
+    """Colour of the unit-square point (x, y) as (r, g, b, a)."""
+    if not in_rounded_rect(x, y, 0.0, 0.0, 1.0, 1.0, CORNER_RADIUS):
+        return (0, 0, 0, 0)
+
+    colour = BACKGROUND
+
+    for index, row_y in enumerate(ROW_Y):
+        alpha = ROW_ALPHA[index]
+        ink = UNWATCHED if index == 0 else WATCHED
+
+        if in_circle(x, y, DOT_X, row_y, DOT_RADIUS):
+            colour = over(ink, alpha, colour)
+        elif in_rounded_rect(
+            x,
+            y,
+            BAR_X0,
+            row_y - BAR_HALF_HEIGHT,
+            BAR_X1,
+            row_y + BAR_HALF_HEIGHT,
+            BAR_HALF_HEIGHT,
+        ):
+            colour = over(ink, alpha, colour)
+
+    return (*colour, 255)
 
 
 def render(size):
@@ -88,14 +106,7 @@ def render(size):
                 row += bytes((0, 0, 0, 0))
                 continue
 
-            row += bytes(
-                (
-                    round(r / a),
-                    round(g / a),
-                    round(b / a),
-                    round(255 * a / samples),
-                )
-            )
+            row += bytes((round(r / a), round(g / a), round(b / a), round(255 * a / samples)))
         rows.append(bytes(row))
 
     return rows
@@ -113,13 +124,12 @@ def write_png(path, size, rows):
         )
 
     header = struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0)
-    png = (
+    path.write_bytes(
         b"\x89PNG\r\n\x1a\n"
         + chunk(b"IHDR", header)
         + chunk(b"IDAT", zlib.compress(raw, 9))
         + chunk(b"IEND", b"")
     )
-    path.write_bytes(png)
 
 
 def main():
@@ -127,9 +137,8 @@ def main():
     out.mkdir(exist_ok=True)
 
     for size in SIZES:
-        target = out / f"icon{size}.png"
-        write_png(target, size, render(size))
-        print(f"wrote {target.relative_to(target.parent.parent)} ({size}x{size})")
+        write_png(out / f"icon{size}.png", size, render(size))
+        print(f"wrote icons/icon{size}.png ({size}x{size})")
 
 
 if __name__ == "__main__":
