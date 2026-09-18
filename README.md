@@ -1,4 +1,4 @@
-# YouTube Unwatched Filter
+# Unwatched Filter for YouTube
 
 A Chrome extension that adds an **Unwatched** filter beside Latest, Popular and Oldest on any YouTube channel's Videos tab.
 
@@ -97,7 +97,7 @@ These are deliberate, not oversights:
 
 ## Troubleshooting
 
-Open DevTools on the YouTube tab, and in the **Console**, switch the context dropdown (top left of the console, usually reading `top`) to **YouTube Unwatched Filter**. Then run:
+Open DevTools on the YouTube tab, and in the **Console**, switch the context dropdown (top left of the console, usually reading `top`) to **Unwatched Filter for YouTube**. Then run:
 
 ```js
 __ytUnwatched.report()
